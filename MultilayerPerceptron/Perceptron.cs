@@ -1,7 +1,6 @@
 ﻿namespace MultilayerPerceptron
 {
 	using System;
-	using System.Runtime.CompilerServices;
 
 	public class Perceptron
 	{
@@ -10,6 +9,7 @@
 		private double[,] wOL;
 		private double[] valuesHL;
 		private double[] valuesOL;
+		private double[] deltaOL;
 		private readonly int _n;
 		private readonly int _p;
 		private readonly int _h;
@@ -30,6 +30,7 @@
 			wOL = new double[_h, _p];
 			valuesHL = new double[_h];
 			valuesOL = new double[_p];
+			deltaOL = new double[_p];
 
 			//wHL initialization
 			for (int i = 0; i < _n; i++)
@@ -93,7 +94,7 @@
 			var expectedResult = new double[_p];
 			expectedResult[i] = 1.0;
 
-			while(true)
+			while (true)
 			{
 				y = GetNeuronResult(input);
 
@@ -117,7 +118,19 @@
 			{
 				for (int j = 0; j < _p; j++)
 				{
-					wOL[i, j] = wOL[i, j] + Speed*valuesHL[i]*valuesOL[j]*(1 - valuesOL[j])*(expectedResult[j] - valuesOL[j]);
+					deltaOL[j] = valuesOL[j] * (1 - valuesOL[j]) * (expectedResult[j] - valuesOL[j]);
+					wOL[i, j] = wOL[i, j] + Speed * valuesHL[i] * deltaOL[j];
+				}
+			}
+		}
+
+		private void CorrectionHiddenLayer()
+		{
+			for (int i = 0; i < _n; i++)
+			{
+				for (int j = 0; j < _h; j++)
+				{
+					wHL[i, j] = wHL[i, j];
 				}
 			}
 		}
@@ -128,7 +141,7 @@
 
 			for (int i = 0; i < x.Length; i++)
 			{
-				sum += matrix[i, j]*x[i];
+				sum += matrix[i, j] * x[i];
 			}
 
 			return sum;
