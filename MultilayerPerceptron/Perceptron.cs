@@ -62,7 +62,7 @@
 			return r.Next(-100, 100) / 100.0;
 		}
 
-		private double[] GetNeuronResult(double[] input)
+		public double[] GetNeuronResult(double[] input)
 		{
 			if (input.Length != _n)
 			{

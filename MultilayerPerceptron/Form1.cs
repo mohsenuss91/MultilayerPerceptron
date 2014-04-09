@@ -12,17 +12,26 @@ namespace MultilayerPerceptron
 	{
 		private Bitmap originalImage;
 		private Dictionary<string, Bitmap> _originalImages;
-		private NeuralNetwork _neuralNetwork;
+//		private NeuralNetwork _neuralNetwork;
+	    private Perceptron _perceptron;
+	    private readonly Dictionary<string, int> _imageClassDictionary; 
 
 		public Form1()
 		{
 			InitializeComponent();
-			new Perceptron(2, 3, 4);
+			_perceptron = new Perceptron(2, 3, 4);
 			//originalImage = null;
-			//_originalImages = new Dictionary<string, Bitmap>();
-			//ImageInitialization();
+			_originalImages = new Dictionary<string, Bitmap>();
+            _imageClassDictionary = new Dictionary<string, int>();
+			ImageInitialization();
 			//_neuralNetwork = new NeuralNetwork();
 			//_neuralNetwork.TeachingNeuralNetwork(_originalImages.Values.ToArray());
+
+            foreach (var image in _originalImages)
+            {
+                _perceptron.TrainedNeural(new ImageMapper().ToDouble(image.Value),
+                    _imageClassDictionary[image.Key]);
+            }
 		}
 
 		private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
@@ -57,16 +66,21 @@ namespace MultilayerPerceptron
 
 		private void buttonStart_Click(object sender, EventArgs e)
 		{
-			pictureBoxResult.Image = _neuralNetwork.RecognizeImage(originalImage);
+			//pictureBoxResult.Image = _neuralNetwork.RecognizeImage(originalImage);
+		    var result = _perceptron.GetNeuronResult(new ImageMapper().ToDouble(originalImage));
+            Console.WriteLine(result);
 		}
 
 		private void ImageInitialization()
 		{
 			var appSettings = ConfigurationManager.AppSettings;
+		    int classIndex = 0;
 			foreach (var letter in comboBoxLetter.Items)
 			{
 				var key = appSettings[letter.ToString()];
 				_originalImages[key] = new Bitmap("../../Content/" + key + ".png");
+
+                _imageClassDictionary.Add(key, classIndex++);
 			}
 		}
 	}

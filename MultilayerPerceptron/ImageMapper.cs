@@ -24,7 +24,7 @@ namespace MultilayerPerceptron
             return result;
         }
 
-        private double ActivationFunction(Color pixel)
+        public virtual double ActivationFunction(Color pixel)
         {
 			if (pixel.B > 127 && pixel.R > 127 && pixel.G > 127)
 			{
