@@ -110,6 +110,7 @@
 		private void FeedbackErrorCorrection(double[] y, double[] expectedResult)
 		{
 			CorrectionOutputLayer(y, expectedResult);
+			CorrectionHiddenLayer();
 		}
 
 		private void CorrectionOutputLayer(double[] y, double[] expectedResult)
@@ -130,7 +131,16 @@
 			{
 				for (int j = 0; j < _h; j++)
 				{
-					wHL[i, j] = wHL[i, j];
+					double delta = 0;
+
+					for (int k = 0; k < _p; k++)
+					{
+						delta += deltaOL[k]*wOL[j, k];
+					}
+
+					delta *= valuesHL[j]*(1 - valuesHL[j]);
+
+					wHL[i, j] = wHL[i, j] + Speed * delta * valuesHL[j];
 				}
 			}
 		}
