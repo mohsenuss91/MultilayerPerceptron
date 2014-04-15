@@ -19,19 +19,24 @@ namespace MultilayerPerceptron
 		public Form1()
 		{
 			InitializeComponent();
-			_perceptron = new Perceptron(2, 3, 4);
+			_perceptron = new Perceptron(18*18,4,25);
 			//originalImage = null;
 			_originalImages = new Dictionary<string, Bitmap>();
             _imageClassDictionary = new Dictionary<string, int>();
 			ImageInitialization();
 			//_neuralNetwork = new NeuralNetwork();
 			//_neuralNetwork.TeachingNeuralNetwork(_originalImages.Values.ToArray());
+            InitializationPicturesPanel();
 
-            foreach (var image in _originalImages)
-            {
-                _perceptron.TrainedNeural(new ImageMapper().ToDouble(image.Value),
-                    _imageClassDictionary[image.Key]);
-            }
+		    for (int i = 0; i < 10; i++)
+		    {
+                foreach (var image in _originalImages)
+                {
+                    _perceptron.TrainedNeural(new ImageMapper().ToDouble(image.Value),
+                        _imageClassDictionary[image.Key]);
+                }
+		    }
+            
 		}
 
 		private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
@@ -54,6 +59,11 @@ namespace MultilayerPerceptron
 		{
 			originalImage = new Bitmap(_originalImages[ConfigurationManager.AppSettings[comboBoxLetter.SelectedItem.ToString()]]);
 			pictureBoxOriginal.Image = originalImage;
+
+            labelK.Text = "";
+            labelL.Text = "";
+            labelM.Text = "";
+            labelN.Text = "";
 		}
 
 		private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
@@ -62,13 +72,22 @@ namespace MultilayerPerceptron
 			{
 				buttonGenerateNoise.Enabled = true;
 			}
+            labelK.Text = "";
+            labelL.Text = "";
+            labelM.Text = "";
+            labelN.Text = "";
 		}
 
 		private void buttonStart_Click(object sender, EventArgs e)
 		{
 			//pictureBoxResult.Image = _neuralNetwork.RecognizeImage(originalImage);
 		    var result = _perceptron.GetNeuronResult(new ImageMapper().ToDouble(originalImage));
-            Console.WriteLine(result);
+
+            labelK.Text = Math.Round(result[0], 4).ToString();
+            labelL.Text = Math.Round(result[1], 4).ToString();
+            labelM.Text = Math.Round(result[2], 4).ToString();
+            labelN.Text = Math.Round(result[3], 4).ToString();
+
 		}
 
 		private void ImageInitialization()
@@ -83,5 +102,18 @@ namespace MultilayerPerceptron
                 _imageClassDictionary.Add(key, classIndex++);
 			}
 		}
+
+	    private void InitializationPicturesPanel()
+	    {
+	        pictureBoxK.Image = _originalImages["K"];
+            pictureBoxL.Image = _originalImages["L"];
+            pictureBoxM.Image = _originalImages["M"];
+            pictureBoxN.Image = _originalImages["N"];
+	    }
+
+	    private void tableLayoutPanel4_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
 	}
 }

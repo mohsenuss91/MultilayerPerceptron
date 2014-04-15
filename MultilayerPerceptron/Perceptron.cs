@@ -1,4 +1,6 @@
-﻿namespace MultilayerPerceptron
+﻿using System.Windows.Forms;
+
+namespace MultilayerPerceptron
 {
 	using System;
 
@@ -13,8 +15,8 @@
 		private readonly int _n;
 		private readonly int _p;
 		private readonly int _h;
-		private const double a = 0.5;
-		private const double Speed = 0.99;
+		private const double a = 0.8;
+		private const double Speed = 5;
 
 		public Perceptron(int n, int p, int h)
 		{
@@ -32,12 +34,14 @@
 			valuesOL = new double[_p];
 			deltaOL = new double[_p];
 
+            var r = new Random();
+
 			//wHL initialization
 			for (int i = 0; i < _n; i++)
 			{
 				for (int j = 0; j < _h; j++)
 				{
-					wHL[i, j] = GenerateInitialValue();
+                    wHL[i, j] = r.Next(-100, 100) / 100.0; 
 				}
 			}
 
@@ -46,7 +50,7 @@
 			{
 				for (int j = 0; j < _p; j++)
 				{
-					wOL[i, j] = GenerateInitialValue();
+                    wOL[i, j] = r.Next(-100, 100) / 100.0;
 				}
 			}
 		}
@@ -103,29 +107,33 @@
 					break;
 				}
 
-				FeedbackErrorCorrection(y, expectedResult);
+				FeedbackErrorCorrection(y, expectedResult, input);
 			}
 		}
 
-		private void FeedbackErrorCorrection(double[] y, double[] expectedResult)
+		private void FeedbackErrorCorrection(double[] y, double[] expectedResult, double[] input)
 		{
 			CorrectionOutputLayer(y, expectedResult);
-			CorrectionHiddenLayer();
+			CorrectionHiddenLayer(input);
 		}
 
 		private void CorrectionOutputLayer(double[] y, double[] expectedResult)
 		{
+		    for (int j = 0; j < _p; j++)
+		    {
+                deltaOL[j] = valuesOL[j] * (1 - valuesOL[j]) * (expectedResult[j] - valuesOL[j]);    
+		    }
+
 			for (int i = 0; i < _h; i++)
 			{
 				for (int j = 0; j < _p; j++)
-				{
-					deltaOL[j] = valuesOL[j] * (1 - valuesOL[j]) * (expectedResult[j] - valuesOL[j]);
+				{		
 					wOL[i, j] = wOL[i, j] + Speed * valuesHL[i] * deltaOL[j];
 				}
 			}
 		}
 
-		private void CorrectionHiddenLayer()
+		private void CorrectionHiddenLayer(double[] input)
 		{
 			for (int i = 0; i < _n; i++)
 			{
@@ -133,14 +141,14 @@
 				{
 					double delta = 0;
 
-					for (int k = 0; k < _p; k++)
-					{
-						delta += deltaOL[k]*wOL[j, k];
-					}
+                    for (int k = 0; k < _p; k++)
+                    {
+                        delta += deltaOL[k] * wOL[j, k];
+                    }
 
 					delta *= valuesHL[j]*(1 - valuesHL[j]);
 
-					wHL[i, j] = wHL[i, j] + Speed * delta * valuesHL[j];
+					wHL[i, j] = wHL[i, j] + Speed * delta * input[i];
 				}
 			}
 		}
